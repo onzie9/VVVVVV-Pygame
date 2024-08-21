@@ -15,6 +15,7 @@ screen = pygame.display.set_mode(screenSize)
 pygame.display.set_caption("VVVVVV")
 pygame.display.set_icon(pygame.image.load("./assets/icon.png"))
 epstein_didnt_kill_himself = True
+invincibility = False
 clock = pygame.time.Clock()
 pygame.mixer.music.set_volume(0.4)
 
@@ -396,7 +397,7 @@ class Room:
         self.platforms = []     # Array of all moving platforms in the room
         self.enemies = []       # Array of all enemies in the room
         self.lines = []         # Array of all the gravity lines in the room
-        self.meta = {"name": "Outer Space", "color": 0, "tileset": 7, "warp": 0, "enemyType": [1, 1, 1]}    # Metadata
+        self.meta = {"name": "Outer Space", "color": 0, "tileset": 7, "warp": 5, "enemyType": [1, 1, 1]}    # Metadata
         self.exists = True
 
         try:  # Attempt to open the room file
@@ -422,6 +423,7 @@ class Room:
                     self.recolor(g, self.meta["color"])  # Recolor enemies
         for w in warpBGs:
             self.recolor(w, self.meta["color"])  # Recolor warp background
+
         if self.meta["tileset"] == 8:  # Lab tileset
             bgCol = palette[self.meta["color"]][1][8]  # Recolor lab background
         else:
@@ -553,7 +555,8 @@ class Room:
 
                     if 26 <= spriteNum <= 29 and player.alive:  # If object is a spike
                         if player.touching([tileX * 32, tileY * 32], 12):
-                            player.die()  # If you touch a spike, die!
+                            if not invincibility:
+                                player.die()  # If you touch a spike, die!
 
                     if player.alive and issolid(spriteNum):  # If object is a solid block
 
@@ -632,7 +635,8 @@ class Enemy:
             if self.ySpeed: self.y = roundto(self.y + self.ySpeed, self.ySpeed)
 
             if player.touching([self.x, self.y], self.hitbox, [self.size, self.size]):
-                player.die()  # Die if you're touching the enemy
+                if not invincibility:
+                    player.die()  # Die if you're touching the enemy
 
         if enemyTimer >= enemyAnimation*4:  # Animate the enemy
             enemyTimer = 0
@@ -698,7 +702,8 @@ class Platform:
                     player.blocked[0] = True  # Block left if touching right of platform
                 elif player.grounded or issolid(getobj([snap(player.x), snap(player.y + flipoffset)])) or issolid(
                         getobj([snap(player.x + 32), snap(player.y + flipoffset)])):
-                    player.die()  # Die if crushed by platform
+                    if not invincibility:
+                        player.die()  # Die if crushed by platform
                 else:
                     player.verticalPlatform[0] = self.y  # Save Y position of platform for player.exist()
                     player.verticalPlatform[1] = self.ySpeed > 0  # Save direction of platform for player.exist()
@@ -1075,13 +1080,16 @@ def checksave():    # Load save file
 def buildmenu():    # Builds the main menu
     global menu, savedGame
     checksave()
-    menu = Menu("menu", ["new game", "continue", "quit"], 225)
+    if invincibility:
+        menu = Menu("menu", ["new game", "continue", "quit", "turn invincibility off"], 225)
+    else:
+        menu = Menu("menu", ["new game", "continue", "quit", "turn invincibility on"], 225)
     if not savedGame:
         menu.lock(1)    # Disable "continue" option if no saved game
 
 
 def runMenus():   # Run code depending on what menu option is selected
-    global menu, area, player, ingame, checkpoint, levelFolder, cpRoom, epstein_didnt_kill_himself
+    global menu, area, player, ingame, checkpoint, levelFolder, cpRoom, epstein_didnt_kill_himself, invincibility
     option = menu.run()
 
     if menu.name == "pause":    # Pause menu
@@ -1189,6 +1197,11 @@ def runMenus():   # Run code depending on what menu option is selected
 
         if option == 2:     # Quit
             epstein_didnt_kill_himself = False
+
+        if option == 3:     # Invincibility
+            invincibility = not invincibility
+
+            buildmenu()
 
 
 def startlevel(levelObj):   # Starts a stage

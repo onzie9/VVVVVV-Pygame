@@ -379,6 +379,7 @@ while not done:
 
             for i in range(1, 10): # Eval seems to be the best way to check if *any* function key is pressed
                 if event.key == eval("pygame.K_F" + str(i)) and i <= len(levels):
+                    print("Function key was pressed!")
                     loadFolder(levels[i-1])
 
             if event.key == pygame.K_RIGHT:
