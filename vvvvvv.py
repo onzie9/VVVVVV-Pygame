@@ -1,4 +1,5 @@
 import os
+import argparse
 try:
     import pygame, json, math, random, time, os
     from pygame.draw import line, rect
@@ -6,6 +7,20 @@ except ImportError:
     os.system('py3 -m pip install pygame')  # Automatically install PyGame
 from spritesheet import Spritesheet   # Saved in another file since it's used elsewhere
 from palette import Palette
+
+parser = argparse.ArgumentParser()
+parser.add_argument("a")
+parser.add_argument("b")
+parser.add_argument("playtestOverride")
+parser.add_argument("levelName")
+args = parser.parse_args()
+try:
+    if args.playtestOverride == "playtestOverride":
+        playtestOverride = True
+        levelName = args.levelName
+except:
+    levelName = None
+    playtestOverride = False
 
 pygame.mixer.pre_init(44100, -16, 2, 1024)  # Removes sound latency
 pygame.init()
@@ -64,6 +79,7 @@ subtitle = font.render("Pygame Edition", 1, (0, 255, 255))
 levelSelect = font.render("Select Stage", 1, (0, 255, 255))
 
 # levels.vvvvvv is a JSON file which stores the names and folders of each level
+
 with open("levels.vvvvvv", 'r') as levelarray:
     levels = json.loads(levelarray.read())
 levelFolder = levels[0]["folder"]
@@ -866,6 +882,7 @@ def newroom(change, newPos, warpType):    # Change room relative to current one 
     global player, room, enemyTimer
     player.x = newPos[0]
     player.y = newPos[1]
+
     if room.meta["warp"] != warpType and player.winTimer == 0:
         enemyTimer = 0
         loadroom(room.x + change[0], room.y + change[1])
@@ -1137,7 +1154,7 @@ def runMenus():   # Run code depending on what menu option is selected
                     buildmenu()     # Return to main menu upon pressing "back" or escape
                     sfx_menu.play()
                 else:
-                    startlevel(levels[i])   # Start the selected level
+                    startlevel(levels[i], playtestOverride)   # Start the selected level
 
         # Display high scores in the bottom left corner
         if menu.selected < len(levels) and menu.name == "levels":  # Checking menu.name a second time fixes a small visual bug when pressing "back" (see for yourself)
@@ -1204,12 +1221,17 @@ def runMenus():   # Run code depending on what menu option is selected
             buildmenu()
 
 
-def startlevel(levelObj):   # Starts a stage
+def startlevel(levelObj, playtestOverride=False,playtestOverride_x=5,playtestOverride_y=5):   # Starts a stage
     global checkpoint, levelFolder, ingame, player, area, cpRoom
     player = Player()   # Create fresh new player
     levelFolder = levelObj["folder"]
     area = levelObj["name"]
-    loadroom(levelObj["startingRoom"][0], levelObj["startingRoom"][1])
+    if playtestOverride:
+        playtestOverride_x = int(args.a)
+        playtestOverride_y = int(args.b)
+        loadroom(playtestOverride_x,playtestOverride_y)
+    else:
+        loadroom(levelObj["startingRoom"][0], levelObj["startingRoom"][1])
     player.x = levelObj["startingCoords"][0]
     player.y = levelObj["startingCoords"][1]
     checkpoint = [room.x, room.y, player.x, player.y, player.flipped]
@@ -1225,6 +1247,12 @@ for i in range(30):  # Prepare some stars for the normal background
         rects.append([random.randint(0, screenSize[0]), random.randint(0, screenSize[1]), random.randint(1, 4)])
 
 getMusic(True)
+
+if playtestOverride:
+    json_idx = [x["folder"] for x in levels].index(levelName)
+    levelObj = levels[json_idx]
+    startlevel(levelObj, playtestOverride, playtestOverride_x=args.a, playtestOverride_y=args.b)
+
 buildmenu()
 
 #####################

@@ -1,4 +1,5 @@
 import os
+import subprocess
 try:
     import pygame, json, math, random, os
     from pygame.draw import line, rect
@@ -359,6 +360,7 @@ while not done:
             specialBrush = [specialTiles[specialID][1] or brushSize, specialTiles[specialID][2] or brushSize]
             rect(screen, WHITE, (gridX * 32, gridY * 32, 32 * specialBrush[0], 32 * specialBrush[1]), 5)
 
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             done = True
@@ -381,6 +383,19 @@ while not done:
                 if event.key == eval("pygame.K_F" + str(i)) and i <= len(levels):
                     print("Function key was pressed!")
                     loadFolder(levels[i-1])
+
+            if event.key == pygame.K_q:
+                pygame.quit()
+            if event.key == pygame.K_p:
+                if not os.path.exists(levelFolder):
+                    os.makedirs(levelFolder)
+                with open("./" + levelFolder + "/" + roomStr + ".vvvvvv", 'w') as data:
+                    leveldata = {"meta": room.meta, "enemies": room.enemies, "warp": room.meta["warp"], "platforms": room.platforms, "lines": room.lines, "tiles": room.tiles}
+                    json.dump(leveldata, data)
+                    lastRoom = [room.x, room.y]
+                    print("✅ Saved to", roomStr + ".vvvvvv!")
+
+                subprocess.run(["python", "vvvvvv.py", str(room.x), str(room.y), "playtestOverride", levelFolder])
 
             if event.key == pygame.K_RIGHT:
                 room.x += 1
