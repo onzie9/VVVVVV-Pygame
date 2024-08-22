@@ -244,7 +244,10 @@ warpSheet = Spritesheet("./assets/warps.png")
 teleSheet = Spritesheet("./assets/teleporters.png")
 editorSheet = Spritesheet("./assets/editorTiles.png")
 enemySheetSmall = Spritesheet("./assets/enemies_small.png")
+smallSprites = pygame.image.load("./assets/enemies_small.png").get_size()
 enemySheetLarge = Spritesheet("./assets/enemies_large.png")
+largeSprites = pygame.image.load("./assets/enemies_large.png").get_size()
+enemyCounts = [int(smallSprites[1]/64), int(largeSprites[1]/128)]
 
 def loadsprites():
     global sprites, groundTiles, backgroundTiles, enemySprites, specialSprites, spikeTiles, warpBGs

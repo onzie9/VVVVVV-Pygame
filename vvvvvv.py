@@ -66,7 +66,10 @@ conveyorSheet = Spritesheet("./assets/conveyors.png")
 warpSheet = Spritesheet("./assets/warps.png")
 teleSheet = Spritesheet("./assets/teleporters.png")
 enemySheetSmall = Spritesheet("./assets/enemies_small.png")
+smallSprites = pygame.image.load("./assets/enemies_small.png").get_size()
 enemySheetLarge = Spritesheet("./assets/enemies_large.png")
+largeSprites = pygame.image.load("./assets/enemies_large.png").get_size()
+enemyCounts = [int(smallSprites[1]/64), int(largeSprites[1]/128)]
 
 # MISC TEXTURES
 menuBG = pygame.image.load("./assets/menuBG.png").convert()
@@ -814,7 +817,7 @@ spikeTiles = []                   # Array of all spike tiles
 warpBGs = []                      # Array of warp backgrounds
 teleporters = []                  # Array of teleporter frames
 enemySprites = [[], []]           # Array of all the enemy textures
-enemyCounts = [12, 4]             # How many enemies there are, for each type
+#enemyCounts = [12, 4]             # How many enemies there are, for each type
 largeHitboxes = [35, 32, 38, 40]  # Hitbox sizes of large 4x4 enemies
 
 stars = []              # Array of all the stars in the background
