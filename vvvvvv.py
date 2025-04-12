@@ -18,6 +18,9 @@ try:
     if args.playtestOverride == "playtestOverride":
         playtestOverride = True
         levelName = args.levelName
+    else:
+        levelName = None
+        playtestOverride = False
 except:
     levelName = None
     playtestOverride = False
@@ -31,6 +34,7 @@ pygame.display.set_caption("VVVVVV")
 pygame.display.set_icon(pygame.image.load("./assets/icon.png"))
 epstein_didnt_kill_himself = True
 invincibility = False
+blind_mode = False
 clock = pygame.time.Clock()
 pygame.mixer.music.set_volume(0.4)
 
@@ -60,6 +64,7 @@ tileSheet = Spritesheet("./assets/tiles.png")
 backgroundSheet = Spritesheet("./assets/backgrounds.png")
 spikeSheet = Spritesheet("./assets/spikes.png")
 playerSheet = Spritesheet("./assets/player.png")
+playerSheetDark = Spritesheet("./assets/player_dark.png")
 checkpointSheet = Spritesheet("./assets/checkpoints.png")
 platformSheet = Spritesheet("./assets/platforms.png")
 conveyorSheet = Spritesheet("./assets/conveyors.png")
@@ -101,8 +106,8 @@ class Player:
         self.y = 0          # Player Y
         self.width = 48     # Player width, for collission detection
         self.height = 96    # Player height
-        self.speed = 12     # Player X speed
-        self.velocity = 20  # Player Y speed
+        self.speed = 8     # Player X speed default 12
+        self.velocity = 20  # Player Y speed default 20
 
         # These values are dispalyed when completing a level and saved as high scores
         self.deaths = 0
@@ -930,7 +935,10 @@ def switchtileset(row):  # Switches the currently loaded tileset. Runs on every 
 
     appendeach([0] * 26, sprites)  # Leave space for the ground/background tiles. These are added later
     appendeach(spikeTiles[0], sprites)  # Append spikes to 26-29. Assume regular tileset
-    appendeach(playerSheet.split(player.width, player.height, 3), sprites)  # Append player sprites to 30-32
+    if blind_mode:
+        appendeach(playerSheetDark.split(player.width, player.height, 3), sprites)  # Append player sprites to 30-32
+    else:
+        appendeach(playerSheet.split(player.width, player.height, 3), sprites)  # Append player sprites to 30-32
     appendeach(checkpointSheet.split(64, 64, 4), sprites)  # Append checkpoint sprites to 33-36
     appendeach(platformSheet.split(128, 32, 5), sprites)  # Append platforms to 37-41
     appendeach(conveyorSheet.split(32, 32, 8), sprites)  # Append conveyors to 42-49
@@ -1100,16 +1108,20 @@ def checksave():    # Load save file
 def buildmenu():    # Builds the main menu
     global menu, savedGame
     checksave()
-    if invincibility:
-        menu = Menu("menu", ["new game", "continue", "quit", "turn invincibility off"], 225)
+    if invincibility and blind_mode:
+        menu = Menu("menu", ["new game", "continue", "quit", "turn invincibility off", "turn blind mode off"], 225)
+    elif invincibility and not blind_mode:
+        menu = Menu("menu", ["new game", "continue", "quit", "turn invincibility off", "turn blind mode on"], 225)
+    elif not invincibility and blind_mode:
+        menu = Menu("menu", ["new game", "continue", "quit", "turn invincibility on", "turn blind mode off"], 225)
     else:
-        menu = Menu("menu", ["new game", "continue", "quit", "turn invincibility on"], 225)
+        menu = Menu("menu", ["new game", "continue", "quit", "turn invincibility on", "turn blind mode on"], 225)
     if not savedGame:
         menu.lock(1)    # Disable "continue" option if no saved game
 
 
 def runMenus():   # Run code depending on what menu option is selected
-    global menu, area, player, ingame, checkpoint, levelFolder, cpRoom, epstein_didnt_kill_himself, invincibility
+    global menu, area, player, ingame, checkpoint, levelFolder, cpRoom, epstein_didnt_kill_himself, invincibility, blind_mode
     option = menu.run()
 
     if menu.name == "pause":    # Pause menu
@@ -1220,7 +1232,10 @@ def runMenus():   # Run code depending on what menu option is selected
 
         if option == 3:     # Invincibility
             invincibility = not invincibility
+            buildmenu()
 
+        if option == 4:  # Dark Mode
+            blind_mode = not blind_mode
             buildmenu()
 
 
