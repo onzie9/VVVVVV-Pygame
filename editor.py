@@ -398,7 +398,7 @@ while not done:
                     lastRoom = [room.x, room.y]
                     print("✅ Saved to", roomStr + ".vvvvvv!")
 
-                subprocess.run(["python", "vvvvvv.py", str(room.x), str(room.y), "playtestOverride", levelFolder])
+                subprocess.run(["python3", "vvvvvv.py", str(room.x), str(room.y), "playtestOverride", levelFolder])
 
             if event.key == pygame.K_RIGHT:
                 room.x += 1
