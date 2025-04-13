@@ -397,8 +397,11 @@ while not done:
                     json.dump(leveldata, data)
                     lastRoom = [room.x, room.y]
                     print("✅ Saved to", roomStr + ".vvvvvv!")
+                with open("levels.vvvvvv", 'r') as levelarray:
+                    levels = json.loads(levelarray.read())
 
-                subprocess.run(["python3", "vvvvvv.py", str(room.x), str(room.y), "playtestOverride", levelFolder])
+                monsterMayhemBool = str([x for x in levels if x['folder']==levelFolder][0]['monsterMayhem'])
+                subprocess.run(["python3", "vvvvvv.py", str(room.x), str(room.y), "True", monsterMayhemBool, levelFolder])
 
             if event.key == pygame.K_RIGHT:
                 room.x += 1

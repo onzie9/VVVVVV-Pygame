@@ -12,15 +12,19 @@ parser = argparse.ArgumentParser()
 parser.add_argument("a")
 parser.add_argument("b")
 parser.add_argument("playtestOverride")
+parser.add_argument("monsterMayhem")
 parser.add_argument("levelName")
 args = parser.parse_args()
 try:
-    if args.playtestOverride == "playtestOverride":
+    if args.playtestOverride == "True":
         playtestOverride = True
         levelName = args.levelName
+        if args.monsterMayhem == "True":
+            monsterMayhem = True
     else:
         levelName = None
         playtestOverride = False
+        monsterMayhem = False
 except:
     levelName = None
     playtestOverride = False
@@ -35,7 +39,6 @@ pygame.display.set_icon(pygame.image.load("./assets/icon.png"))
 epstein_didnt_kill_himself = True
 invincibility = False
 blind_mode = False
-monsterMayhem = False
 clock = pygame.time.Clock()
 pygame.mixer.music.set_volume(0.4)
 
@@ -1271,8 +1274,8 @@ def runMenus():   # Run code depending on what menu option is selected
             buildmenu()
 
 
-def startlevel(levelObj, playtestOverride=False):   # Starts a stage
-    global checkpoint, levelFolder, ingame, player, area, cpRoom
+def startlevel(levelObj, playtestOverride=False, playtestOverride_x=1, playtestOverride_y=1):   # Starts a stage
+    global checkpoint, levelFolder, ingame, player, area, cpRoom, args
     player = Player()   # Create fresh new player
     levelFolder = levelObj["folder"]
     area = levelObj["name"]
