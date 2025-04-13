@@ -5,6 +5,7 @@
         "music": "space",
         "startingRoom": [5, 5],
         "startingCoords": [320, 320],
+        "monsterMayhem": "False",
         "defaultTilesets": [0, 1, 2, 3, 4, 5, 6]
     },
 
@@ -14,7 +15,8 @@
         "music": "lab",
         "startingRoom": [5, 5],
         "startingCoords": [460, 420],
-        "defaultTilesets": [8]
+        "defaultTilesets": [8],
+        "monsterMayhem": "False"
     },
 
     {
@@ -23,7 +25,8 @@
         "music": "warp",
         "startingRoom": [5, 5],
         "startingCoords": [250, 160],
-        "defaultTilesets": [7]
+        "defaultTilesets": [7],
+        "monsterMayhem": "False"
     },
     {
         "folder": "largeoctopus",
@@ -31,7 +34,8 @@
         "music": "lab",
         "startingRoom": [5, 5],
         "startingCoords": [320, 320],
-        "defaultTilesets": [0, 1, 2, 3, 4, 5, 6]
+        "defaultTilesets": [0, 1, 2, 3, 4, 5, 6],
+        "monsterMayhem": "False"
     },
     {
         "folder": "thequantumroad",
@@ -39,7 +43,8 @@
         "music": "warp",
         "startingRoom": [5, 5],
         "startingCoords": [320, 320],
-        "defaultTilesets": [0, 1, 2, 3, 4, 5, 6]
+        "defaultTilesets": [0, 1, 2, 3, 4, 5, 6],
+        "monsterMayhem": "False"
     }
     ,
     {
@@ -48,7 +53,8 @@
         "music": "Gsmash",
         "startingRoom": [5, 5],
         "startingCoords": [320, 320],
-        "defaultTilesets": [0, 1, 2, 3, 4, 5, 6]
+        "defaultTilesets": [0, 1, 2, 3, 4, 5, 6],
+        "monsterMayhem": "False"
     }
     ,
     {
@@ -57,6 +63,16 @@
         "music": "space",
         "startingRoom": [5, 5],
         "startingCoords": [320, 320],
-        "defaultTilesets": [0, 1, 2, 3, 4, 5, 6]
+        "defaultTilesets": [0, 1, 2, 3, 4, 5, 6],
+        "monsterMayhem": "False"
+    },
+    {
+        "folder": "monstermayhemtest",
+        "name": "Monster Mayhem Test",
+        "music": "Eerie-Tunes",
+        "startingRoom": [5, 5],
+        "startingCoords": [320, 320],
+        "defaultTilesets": [0, 1, 2, 3, 4, 5, 6],
+        "monsterMayhem": "True"
     }
 ]

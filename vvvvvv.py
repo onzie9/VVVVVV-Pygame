@@ -35,6 +35,7 @@ pygame.display.set_icon(pygame.image.load("./assets/icon.png"))
 epstein_didnt_kill_himself = True
 invincibility = False
 blind_mode = False
+monsterMayhem = False
 clock = pygame.time.Clock()
 pygame.mixer.music.set_volume(0.4)
 
@@ -65,6 +66,7 @@ backgroundSheet = Spritesheet("./assets/backgrounds.png")
 spikeSheet = Spritesheet("./assets/spikes.png")
 playerSheet = Spritesheet("./assets/player.png")
 playerSheetDark = Spritesheet("./assets/player_dark.png")
+playerSheetMonster = Spritesheet("./assets/player_scare.png")
 checkpointSheet = Spritesheet("./assets/checkpoints.png")
 platformSheet = Spritesheet("./assets/platforms.png")
 conveyorSheet = Spritesheet("./assets/conveyors.png")
@@ -90,6 +92,7 @@ levelSelect = font.render("Select Stage", 1, (0, 255, 255))
 
 with open("levels.vvvvvv", 'r') as levelarray:
     levels = json.loads(levelarray.read())
+    levels = [x for x in levels if x['monsterMayhem'] == str(monsterMayhem)]
 levelFolder = levels[0]["folder"]
 levelMusic = levels[0]["music"]
 
@@ -922,7 +925,7 @@ def switchtileset(row):  # Switches the currently loaded tileset. Runs on every 
     # Sprites are reloaded each room so that they are reverted to their grey state and can be recolored
     # Because of how Pygame handles 'edited' textures, we unfortunately need to re-parse the spritesheets every load
 
-    global sprites, groundTiles, backgroundTiles, spikeTiles, enemySprites, warpBGs
+    global sprites, groundTiles, backgroundTiles, spikeTiles, enemySprites, warpBGs, blind_mode, monsterMayhem
     sprites, warpBGs = [[], []]
     enemySprites = [[], []]
 
@@ -937,6 +940,10 @@ def switchtileset(row):  # Switches the currently loaded tileset. Runs on every 
     appendeach(spikeTiles[0], sprites)  # Append spikes to 26-29. Assume regular tileset
     if blind_mode:
         appendeach(playerSheetDark.split(player.width, player.height, 3), sprites)  # Append player sprites to 30-32
+        monsterMayhem = False
+    elif monsterMayhem:
+        blind_mode = False
+        appendeach(playerSheetMonster.split(player.width, player.height, 3), sprites)  # Append player sprites to 30-32
     else:
         appendeach(playerSheet.split(player.width, player.height, 3), sprites)  # Append player sprites to 30-32
     appendeach(checkpointSheet.split(64, 64, 4), sprites)  # Append checkpoint sprites to 33-36
@@ -1031,9 +1038,15 @@ def roundto(num, target):   # Rounds number to nearest multiple of Y
 
 
 def getMusic(menu=False):   # Figure out what music should be playing
-    global music, levelFolder
-    if menu: song = "menu"
+    global music#, levelFolder
+    if menu:
+        song = "menu"
     else:   # Find song to use based on current level
+        with open("levels.vvvvvv", 'r') as levelarray:
+            levels = json.loads(levelarray.read())
+            levels = [x for x in levels if x['monsterMayhem'] == str(monsterMayhem)]
+        levelFolder = levels[0]["folder"]
+
         for i in levels:
             if i["folder"] == levelFolder:
                 song = i["music"]
@@ -1109,19 +1122,28 @@ def buildmenu():    # Builds the main menu
     global menu, savedGame
     checksave()
     if invincibility and blind_mode:
-        menu = Menu("menu", ["new game", "continue", "quit", "turn invincibility off", "turn blind mode off"], 225)
-    elif invincibility and not blind_mode:
-        menu = Menu("menu", ["new game", "continue", "quit", "turn invincibility off", "turn blind mode on"], 225)
+        menu = Menu("menu", ["new game", "continue", "quit", "turn invincibility off", "turn blind mode off", "monster mayhem unavailable"], 225)
+    elif invincibility and not blind_mode and not monsterMayhem:
+        menu = Menu("menu", ["new game", "continue", "quit", "turn invincibility off", "turn blind mode on", "turn monster mayhem on"], 225)
+    elif invincibility and not blind_mode and monsterMayhem:
+        menu = Menu("menu", ["new game", "continue", "quit", "turn invincibility off", "turn blind mode on", "turn monster mayhem off"], 225)
     elif not invincibility and blind_mode:
-        menu = Menu("menu", ["new game", "continue", "quit", "turn invincibility on", "turn blind mode off"], 225)
+        menu = Menu("menu", ["new game", "continue", "quit", "turn invincibility on", "turn blind mode off", "monster mayhem unavailable"], 225)
+    elif not invincibility and not blind_mode and monsterMayhem:
+        menu = Menu("menu", ["new game", "continue", "quit", "turn invincibility on", "turn blind mode on", "turn monster mayhem off"], 225)
     else:
-        menu = Menu("menu", ["new game", "continue", "quit", "turn invincibility on", "turn blind mode on"], 225)
+        menu = Menu("menu", ["new game", "continue", "quit", "turn invincibility on", "turn blind mode on", "turn monster mayhem on"], 225)
     if not savedGame:
         menu.lock(1)    # Disable "continue" option if no saved game
 
 
 def runMenus():   # Run code depending on what menu option is selected
-    global menu, area, player, ingame, checkpoint, levelFolder, cpRoom, epstein_didnt_kill_himself, invincibility, blind_mode
+    global menu, area, player, ingame, checkpoint, cpRoom, epstein_didnt_kill_himself, invincibility, blind_mode, monsterMayhem#, levelFolder
+    with open("levels.vvvvvv", 'r') as levelarray:
+        levels = json.loads(levelarray.read())
+        levels = [x for x in levels if x['monsterMayhem'] == str(monsterMayhem)]
+    levelFolder = levels[0]["folder"]
+    levelMusic = levels[0]["music"]
     option = menu.run()
 
     if menu.name == "pause":    # Pause menu
@@ -1232,14 +1254,24 @@ def runMenus():   # Run code depending on what menu option is selected
 
         if option == 3:     # Invincibility
             invincibility = not invincibility
+            monsterMayhem = not monsterMayhem
             buildmenu()
 
         if option == 4:  # Dark Mode
             blind_mode = not blind_mode
+            monsterMayhem = False
+            buildmenu()
+
+        if option == 5:  # Monster Mayhem
+            monsterMayhem = not monsterMayhem
+            buildmenu()
+
+        if option == 6:  # Monster Mayhem
+            monsterMayhem = not monsterMayhem
             buildmenu()
 
 
-def startlevel(levelObj, playtestOverride=False,playtestOverride_x=5,playtestOverride_y=5):   # Starts a stage
+def startlevel(levelObj, playtestOverride=False):   # Starts a stage
     global checkpoint, levelFolder, ingame, player, area, cpRoom
     player = Player()   # Create fresh new player
     levelFolder = levelObj["folder"]
