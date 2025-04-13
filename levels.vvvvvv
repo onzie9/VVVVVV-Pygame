@@ -68,7 +68,7 @@
     },
     {
         "folder": "monstermayhemtest",
-        "name": "Monster Mayhem Test",
+        "name": "The Spider Cave",
         "music": "Eerie-Tunes",
         "startingRoom": [5, 5],
         "startingCoords": [320, 320],
